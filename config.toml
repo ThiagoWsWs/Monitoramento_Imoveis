@@ -1,0 +1,55 @@
+# ============================================================
+#  Configuração do monitor de aluguéis
+#  Edite aqui e faça commit: a próxima execução já usa os novos valores.
+# ============================================================
+
+[busca]
+# Cidades (nome exato, como aparece nos sites).
+cidades = ["Gramado", "Canela"]
+
+# Quartos aceitos (mín. e máx.). 1 e 1 = só 1 quarto.
+quartos_min = 1
+quartos_max = 1
+
+# Faixa de aluguel mensal. 0 = sem limite.
+preco_min = 0
+preco_max = 0
+
+# Anúncios com estas palavras no TÍTULO são descartados (temporada etc.).
+palavras_excluir = ["temporada", "diaria", "diarias", "por noite", "pernoite"]
+
+# Anúncios cujo TIPO contenha uma destas palavras são descartados.
+# (Imóvel comercial quase nunca informa quartos, então já cai no filtro
+#  de quartos; esta lista é uma segurança extra.)
+tipos_excluir = [
+  "comercial", "sala", "loja", "pavilhao", "galpao", "ponto", "terreno",
+  "deposito", "predio", "store", "office", "garagem",
+]
+
+[envio]
+# Máximo de imóveis por mensagem diária (os mais baratos primeiro).
+max_por_dia = 100
+# Mandar mensagem mesmo quando não houver nada novo?
+avisar_sem_novidades = true
+
+[fontes.zap]
+ativo = true
+
+[fontes.vivareal]
+ativo = true
+
+[fontes.chavesnamao]
+ativo = true
+
+[fontes.wimoveis]
+ativo = true
+
+# Imobiliárias locais que usam a mesma plataforma de site
+# (página "/alugar-imoveis"). Dá para acrescentar outras com o mesmo layout.
+[fontes.imobiliarias]
+ativo = true
+sites = [
+  { nome = "Altreiter Imóveis", url = "https://www.altreiterimoveis.com.br" },
+  { nome = "Bordin Imóveis", url = "https://www.bordinimoveis.com.br" },
+  { nome = "Gramado Garden", url = "https://www.imobiliariagramadogarden.com.br" },
+]
