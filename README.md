@@ -8,6 +8,10 @@ os que **baixaram de preço**. Roda de graça na nuvem (GitHub Actions).
 - Portais: ZAP Imóveis, Viva Real, Chaves na Mão e Wimoveis (grupo Imovelweb)
 - Imobiliárias locais: Altreiter Imóveis, Bordin Imóveis e Gramado Garden
 
+Cada imóvel chega como uma **foto com a descrição na legenda**. Só a primeira mensagem do
+dia (o resumo) faz o celular tocar; as dos imóveis chegam em silêncio. Para receber uma
+lista compacta, só com texto, use `fotos = false` no `config.toml`.
+
 O mesmo imóvel anunciado em mais de um site aparece uma vez só, com os links de todos.
 Aluguel por temporada e imóveis comerciais são descartados.
 

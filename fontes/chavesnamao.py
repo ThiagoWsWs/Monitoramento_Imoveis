@@ -19,6 +19,8 @@ _RE = re.compile(
     r"/imovel/(?P<tipo>[a-z-]+?)-para-alugar(?:-(?P<q>\d+)-quartos?)?(?P<resto>.*?)"
     r"-rs-(?P<cidade>[a-z-]+?)-(?P<bairro>[a-z0-9-]*?)(?:-(?P<m2>\d+)m2)?-RS(?P<preco>\d+)/id-(?P<id>\d+)/?"
 )
+# ex.: https://www.chavesnamao.com.br/imn/0400X0262/N/60/imoveis/331182/38260318/...-1.jpg
+_RE_FOTO = re.compile(r'https://www\.chavesnamao\.com\.br/imn/[^"\\\s]*?/imoveis/\d+/(?P<id>\d+)/[^"\\\s]+?\.(?:jpe?g|png)')
 
 
 def buscar(cfg: dict, busca: dict) -> list[Imovel]:
@@ -29,7 +31,11 @@ def buscar(cfg: dict, busca: dict) -> list[Imovel]:
             url = f"{BASE}/imoveis-residenciais-para-alugar/rs-{cslug}/"
             if pagina > 1:
                 url += f"?pg={pagina}"
-            sopa = BeautifulSoup(baixar(url), "html.parser")
+            html = baixar(url)
+            fotos: dict[str, str] = {}
+            for f in _RE_FOTO.finditer(html):
+                fotos.setdefault(f["id"], f.group(0))
+            sopa = BeautifulSoup(html, "html.parser")
             novos = 0
             for a in sopa.find_all("a", href=True):
                 m = _RE.search(a["href"])
@@ -51,6 +57,7 @@ def buscar(cfg: dict, busca: dict) -> list[Imovel]:
                     quartos=int(m["q"]) if m["q"] else None,
                     area_m2=float(m["m2"]) if m["m2"] else None,
                     bairro=humanizar_slug(bairro).title() if bairro else "",
+                    foto=fotos.get(m["id"], ""),
                 )
                 novos += 1
             if not novos:

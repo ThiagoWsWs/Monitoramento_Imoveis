@@ -49,6 +49,8 @@ def _um_site(nome_site: str, base: str, cidades: list[str]) -> list[Imovel]:
             tipo, quartos = _categoria(m["cat"])
             preco_el = card.select_one(".listing-price")
             titulo_el = card.select_one("h4, h3, .listing-title")
+            f = re.search(r"url\(['\"]?(https?://[^)'\"]+?\.(?:jpe?g|png))", str(card), re.I)
+            img = card.find("img", src=re.compile(r"\.(jpe?g|png)", re.I))
             res[m["id"]] = Imovel(
                 fonte=nome_site,
                 id=m["id"],
@@ -58,6 +60,7 @@ def _um_site(nome_site: str, base: str, cidades: list[str]) -> list[Imovel]:
                 link=a["href"] if a["href"].startswith("http") else base + a["href"],
                 tipo=tipo,
                 quartos=quartos,
+                foto=f.group(1) if f else (img["src"] if img else ""),
             )
         if not novos:
             break

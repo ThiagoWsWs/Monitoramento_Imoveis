@@ -106,6 +106,9 @@ def agrupar(imoveis: list[Imovel]) -> list[Imovel]:
             par.area_m2 = par.area_m2 or a.area_m2
             par.bairro = par.bairro or a.bairro
             par.condominio = par.condominio or a.condominio
+            # prefere foto em JPEG (a do Chaves na Mão vem em WebP)
+            if a.foto and (not par.foto or ("chavesnamao" in par.foto and "chavesnamao" not in a.foto)):
+                par.foto = a.foto
         else:
             unicos.append(a)
     return unicos
@@ -166,8 +169,10 @@ def montar_mensagem(cfg, novos, baixaram, total, falhas):
         f"{total} disponíveis no total"
     )
     chave = lambda i: i.preco or 10**9  # "Consulte" vai pro fim
-    blocos = [bloco(a, f"  📉 <s>{reais(antes)}</s>") for a, antes in sorted(baixaram, key=lambda x: chave(x[0]))[:maximo]]
-    blocos += [bloco(a) for a in sorted(novos, key=chave)[: max(0, maximo - len(blocos))]]
+    # cada item: (url da foto, texto do imóvel)
+    blocos = [(a.foto, bloco(a, f"  📉 <s>{reais(antes)}</s>"))
+              for a, antes in sorted(baixaram, key=lambda x: chave(x[0]))[:maximo]]
+    blocos += [(a.foto, bloco(a)) for a in sorted(novos, key=chave)[: max(0, maximo - len(blocos))]]
     rodape = []
     resto = len(novos) + len(baixaram) - len(blocos)
     if resto > 0:
@@ -200,13 +205,18 @@ def main() -> int:
 
     if args.teste:
         sys.stdout.reconfigure(encoding="utf-8")
-        print("\n" + cab + "\n\n" + "\n\n".join(blocos) + ("\n\n" + rodape if rodape else ""))
+        print("\n" + cab + "\n\n" + "\n\n".join(f"[foto: {f or '(sem foto)'}]\n{b}" for f, b in blocos)
+              + ("\n\n" + rodape if rodape else ""))
+        print(f"\n{sum(1 for f, _ in blocos if f)} de {len(blocos)} imóveis com foto")
         return 0
 
     if blocos or falhas or cfg.get("envio", {}).get("avisar_sem_novidades", True):
         if not blocos:
             cab += "\n\nNenhum anúncio novo hoje. 😴"
-        telegram.enviar_blocos(cab, blocos, rodape)
+        if cfg.get("envio", {}).get("fotos", True):
+            telegram.enviar_com_fotos(cab, blocos, rodape)
+        else:
+            telegram.enviar_blocos(cab, [b for _, b in blocos], rodape)
 
     ARQ_VISTOS.parent.mkdir(exist_ok=True)
     ARQ_VISTOS.write_text(json.dumps(vistos, ensure_ascii=False, indent=0, sort_keys=True), encoding="utf-8")

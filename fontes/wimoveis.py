@@ -54,6 +54,9 @@ def buscar(cfg: dict, busca: dict) -> list[Imovel]:
                 local = txt("POSTING_CARD_LOCATION")
                 tipo, nome = tipos.get(id_, ("", ""))
                 caminho = (card.get("data-to-posting") or "").split("?")[0]
+                foto = next((u for img in card.find_all("img")
+                             for u in [img.get("src") or img.get("data-src") or ""]
+                             if "/avisos/" in u), "")
                 res[id_] = Imovel(
                     fonte="Wimoveis",
                     id=id_,
@@ -66,6 +69,7 @@ def buscar(cfg: dict, busca: dict) -> list[Imovel]:
                     area_m2=area,
                     bairro=local.split(",")[0].strip() if "," in local else "",
                     condominio=numero(txt("expensas")),
+                    foto=foto.replace("/360x266/", "/720x532/"),
                 )
                 novos += 1
             if not novos:

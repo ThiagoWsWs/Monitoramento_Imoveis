@@ -29,6 +29,9 @@ tipos_excluir = [
 [envio]
 # Máximo de imóveis por mensagem diária (os mais baratos primeiro).
 max_por_dia = 100
+# Mandar cada imóvel com a foto (uma mensagem por imóvel)?
+# false = lista compacta, só texto.
+fotos = true
 # Mandar mensagem mesmo quando não houver nada novo?
 avisar_sem_novidades = true
 

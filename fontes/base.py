@@ -35,6 +35,7 @@ class Imovel:
     area_m2: float | None = None
     bairro: str = ""
     condominio: float | None = None
+    foto: str = ""                # URL da primeira foto (JPG/PNG)
     duplicados: list["Imovel"] = field(default_factory=list, compare=False, repr=False)
 
     @property

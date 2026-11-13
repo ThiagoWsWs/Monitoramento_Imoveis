@@ -31,6 +31,9 @@ def _converter(fonte: str, it: dict, cidade: str) -> Imovel:
     nome = it.get("name", "")
     m = re.search(r"\sem\s+(.+?),\s*[^,]+$", nome)
     tipo_en = (it.get("additionalType") or "").rsplit("/", 1)[-1]
+    imgs = it.get("image") or []
+    foto = (imgs[0] if isinstance(imgs, list) and imgs else imgs if isinstance(imgs, str) else "")
+    foto = re.sub(r"\.webp(?=\?|$)", ".jpg", foto).replace("dimension=614x297", "dimension=870x653")
     return Imovel(
         fonte=fonte,
         id=str(it.get("@id")),
@@ -43,6 +46,7 @@ def _converter(fonte: str, it: dict, cidade: str) -> Imovel:
         area_m2=numero((it.get("floorSize") or {}).get("value")),
         bairro=m.group(1).strip() if m else "",
         condominio=numero(extra.get("value")) if "Condo" in extra.get("name", "") else None,
+        foto=foto,
     )
 
 
